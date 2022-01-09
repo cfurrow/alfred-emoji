@@ -1,5 +1,9 @@
 {
   "version": "1.10.0",
+  "engines": {
+    "npm": ">=7.8.0",
+    "node": ">=16.0.0"  
+  },
   "scripts": {
     "webpack": "webpack",
     "clean": "rm -f *.alfredworkflow; rm -rf output/*",
