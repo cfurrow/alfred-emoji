@@ -1,7 +1,6 @@
 'use strict'
 
-const { emojiSlugs, emojiNames, libContainsEmoji } = require('./emojiLibrary')
-const emojiLibrary = require('./emojiLibrary').lib
+const { emojiSlugs, emojiNames, libContainsEmoji, findEmojiByName } = require('./emojiLibrary')
 const modifiers = require('unicode-emoji-json/data-emoji-components')
 const indexedModifiers = Object.values(modifiers)
 
@@ -73,7 +72,7 @@ const alfredItem = (emoji, name) => {
 const alfredItems = (names) => {
   const items = []
   names.forEach((name) => {
-    const emoji = emojiLibrary[name]
+    const emoji = findEmojiByName(name)
     if (!emoji) return
     items.push(alfredItem(emoji, name))
   })

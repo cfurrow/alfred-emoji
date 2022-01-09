@@ -1,30 +1,33 @@
 'use strict'
-const orderedEmoji = require('unicode-emoji-json/data-ordered-emoji')
-const emojiData = require('unicode-emoji-json')
+const emojiData = require('unicode-emoji-json/data-by-emoji')
 const keywordSet = require('emojilib')
-const emojiNames = orderedEmoji.map(emoji => emojiData[emoji].name)
-const emojiSlugs = orderedEmoji.map(emoji => emojiData[emoji].slug)
+
+const emojiNames = Object.keys(emojiData).map(emoji => emojiData[emoji].name)
+const emojiSlugs = Object.keys(emojiData).map(emoji => emojiData[emoji].slug)
+const emojiNamesToEmojis = Object.keys(emojiData).reduce(
+  (acc, emoji) => {
+    acc[emojiData[emoji].name] = emoji
+    return acc
+  },
+  {})
 
 for (const emoji in emojiData) {
   emojiData[emoji].keywords = keywordSet[emoji]
 }
 
-const emojiByName = {}
-for (const emoji in emojiData) {
-  const emojiName = emojiData[emoji].name
-
-  const emojiObj = emojiData[emoji]
-  emojiObj.char = emoji
-
-  emojiByName[emojiName] = emojiObj
-}
-
 module.exports.emojiData = emojiData
 module.exports.emojiSlugs = emojiSlugs
 module.exports.emojiNames = emojiNames
-module.exports.lib = emojiByName
+
+const findEmojiByName = (name) => {
+  const emoji = emojiNamesToEmojis[name]
+  return { ...emojiData[emoji], char: emoji }
+}
+
+module.exports.findEmojiByName = findEmojiByName
 module.exports.libContainsEmoji = (name, term) => {
-  return emojiByName[name] &&
-   emojiByName[name].keywords &&
-   emojiByName[name].keywords.some((keyword) => keyword.includes(term))
+  const foundEmoji = findEmojiByName(name)
+  return foundEmoji &&
+   foundEmoji.keywords &&
+   foundEmoji.keywords.some((keyword) => keyword.includes(term))
 }

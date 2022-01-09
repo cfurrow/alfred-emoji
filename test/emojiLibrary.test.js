@@ -14,3 +14,9 @@ test('returns false when the library does not contain the emoji', (t) => {
   const wasFound = emojiLibrary.libContainsEmoji('bax', 'bax')
   t.notOk(wasFound)
 })
+
+test('it can find the emoji by name', (t) => {
+  t.plan(1)
+  const emoji = emojiLibrary.findEmojiByName('thumbs up')
+  t.ok(emoji)
+})
