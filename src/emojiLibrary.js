@@ -13,6 +13,7 @@ const emojiNamesToEmojis = Object.keys(emojiData).reduce(
 
 for (const emoji in emojiData) {
   emojiData[emoji].keywords = keywordSet[emoji]
+  emojiData[emoji].char = emoji
 }
 
 module.exports.emojiData = emojiData
@@ -21,7 +22,7 @@ module.exports.emojiNames = emojiNames
 
 const findEmojiByName = (name) => {
   const emoji = emojiNamesToEmojis[name]
-  return { ...emojiData[emoji], char: emoji }
+  return emojiData[emoji]
 }
 
 module.exports.findEmojiByName = findEmojiByName
