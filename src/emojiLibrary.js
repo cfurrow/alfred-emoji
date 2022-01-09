@@ -12,14 +12,11 @@ for (const emoji in emojiData) {
 const emojiByName = {}
 for (const emoji in emojiData) {
   const emojiName = emojiData[emoji].name
-  const emojiSlug = emojiData[emoji].slug
 
   const emojiObj = emojiData[emoji]
   emojiObj.char = emoji
 
-  // TODO: do I need both name and slug?
   emojiByName[emojiName] = emojiObj
-  emojiByName[emojiSlug] = emojiObj
 }
 
 module.exports.emojiData = emojiData
