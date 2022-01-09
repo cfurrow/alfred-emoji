@@ -1,8 +1,11 @@
 'use strict'
 
-const emojilib = require('emojilib')
-const emojiNames = emojilib.ordered
-const modifiers = emojilib.fitzpatrick_scale_modifiers
+const libContainsEmoji = require('./emojiLibrary').libContainsEmoji
+const emojiLibrary = require('./emojiLibrary').lib
+const emojiSlugs = require('./emojiLibrary').emojiSlugs
+const emojiNames = require('./emojiLibrary').emojiNames
+const modifiers = require('unicode-emoji-json/data-emoji-components')
+const indexedModifiers = Object.values(modifiers)
 
 let skinTone
 let modifier
@@ -17,11 +20,12 @@ const resetWordsForPasteByDefault = () => {
 
 const setSkinToneModifier = (tone) => {
   skinTone = tone
-  modifier = skinTone ? modifiers[skinTone] : null
+  modifier = skinTone ? indexedModifiers[skinTone] : null
 }
 
 const addModifier = (emoji, modifier) => {
-  if (!modifier || !emoji.fitzpatrick_scale) return emoji.char
+  const skinToneSupport = emoji.skin_tone_support
+  if (!modifier || !skinToneSupport) return emoji.char
 
   /*
   * There are some emojis categorized as a sequence of emojis
@@ -31,12 +35,13 @@ const addModifier = (emoji, modifier) => {
   * https://emojipedia.org/emoji-zwj-sequence/
   */
 
-  const zwj = new RegExp('‍', 'g')
+  const zwj = new RegExp('‍', 'g') // eslint-disable-line prefer-regex-literals
   return emoji.char.match(zwj) ? emoji.char.replace(zwj, modifier + '‍') : emoji.char + modifier
 }
 
 const getIconName = (emoji, name) => {
-  if (emoji.fitzpatrick_scale && skinTone && skinTone >= 0 && skinTone < 5) {
+  const skinToneSupport = emoji.skin_tone_support
+  if (skinToneSupport && skinTone && skinTone >= 0 && skinTone < 5) {
     return `${name}_${skinTone}`
   }
   return name
@@ -54,12 +59,12 @@ const alfredItem = (emoji, name) => {
     icon: { path: `./icons/${icon}.png` },
     mods: {
       alt: {
-        subtitle: `${verb} ":${name}:" (${emoji.char}) ${preposition}`,
-        arg: `:${name}:`,
+        subtitle: `${verb} ":${emoji.slug}:" (${emoji}) ${preposition}`,
+        arg: `:${emoji.slug}:`,
         icon: { path: `./icons/${name}.png` }
       },
       shift: {
-        subtitle: `${verb} "${emoji.char}" (${name}) ${preposition}`,
+        subtitle: `${verb} "${emoji}" (${name}) ${preposition}`,
         arg: emoji.char,
         icon: { path: `./icons/${name}.png` }
       }
@@ -70,19 +75,19 @@ const alfredItem = (emoji, name) => {
 const alfredItems = (names) => {
   const items = []
   names.forEach((name) => {
-    const emoji = emojilib.lib[name]
+    const emoji = emojiLibrary[name]
     if (!emoji) return
     items.push(alfredItem(emoji, name))
   })
   return { items }
 }
 
-const all = () => alfredItems(emojiNames)
+const all = () => alfredItems(emojiSlugs)
 
 const libHasEmoji = (name, term) => {
-  return emojilib.lib[name] &&
-    emojilib.lib[name].keywords.some((keyword) => keyword.includes(term))
+  return libContainsEmoji(name, term)
 }
+
 const matches = (terms) => {
   return emojiNames.filter((name) => {
     return terms.every((term) => {

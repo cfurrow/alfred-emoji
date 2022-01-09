@@ -1,14 +1,8 @@
 'use strict'
 
 const { test } = require('tap')
-const mock = require('mock-require')
-mock('emojilib', {
-  lib: require('./emojisMock.json'),
-  ordered: require('./orderedMock.json'),
-  fitzpatrick_scale_modifiers: ['🏻', '🏼', '🏽', '🏾', '🏿']
-})
-
 const search = require('../src/search')
+// TODO: we should mock the emoji library so we don't load all the emoji
 
 test('finds "thumbs up"', (t) => {
   t.plan(1)
@@ -75,19 +69,19 @@ test('applies modifier if possible', (t) => {
 test('enables uid', (t) => {
   t.plan(1)
   const found = search('grimacing')
-  t.ok(found.items[0].uid === 'grimacing')
+  t.ok(found.items[0].uid === 'grimacing face')
 })
 
 test('enables autocomplete', (t) => {
   t.plan(1)
   const found = search('think')
-  t.ok(found.items[0].autocomplete === 'thinking')
+  t.ok(found.items[0].autocomplete === 'thinking face')
 })
 
 test('enables alt-modifier', (t) => {
   t.plan(1)
   const found = search('hear_no_evil')
-  t.ok(found.items[0].mods.alt.arg === ':hear_no_evil:')
+  t.ok(found.items[0].mods.alt.arg === ':hear_no_evil_monkey:', 'Expected arg to be ":hear_no_evil:", but was "' + found.items[0].mods.alt.arg + '"')
 })
 
 test('unique results', (t) => {
@@ -101,13 +95,13 @@ test('unique results', (t) => {
 test('finds "open book"', (t) => {
   t.plan(1)
   const found = search('open book')
-  t.ok(found.items[0].title === 'open_book')
+  t.ok(found.items[0].title === 'open book')
 })
 
 test('finds "book open"', (t) => {
   t.plan(1)
   const found = search('book open')
-  t.ok(found.items[0].title === 'open_book')
+  t.ok(found.items[0].title === 'open book')
 })
 
 test('finds "plant nature"', (t) => {
@@ -137,13 +131,14 @@ test('finds "+1" null skin tone', (t) => {
 test('finds "+1" medium skin tone', (t) => {
   t.plan(1)
   const found = search('+1', 2)
-  t.ok(found.items[0].arg === '👍🏽')
+  t.ok(found.items[0].arg === '👍🏽', "Expected to find '👍🏽' but was '" + found.items[0].arg + "'")
 })
 
 test('finds "+1" invalid skin tone', (t) => {
   t.plan(1)
-  const found = search('+1', 5)
-  t.ok(found.items[0].arg === '👍')
+  const skinToneIndex = 9 // NOTE: valid skin tone indexes are from 0 to 8.
+  const found = search('+1', skinToneIndex)
+  t.ok(found.items[0].arg === '👍', "Expected to find '👍' but was '" + found.items[0].arg + "'")
 })
 
 test('enables "+1" shift-modifier neutral skin tone', (t) => {
@@ -175,5 +170,5 @@ test('finds "unicorn" (ignore skin tone)', (t) => {
 test('finds "unicorn" (ignore "random" skin tone)', (t) => {
   t.plan(1)
   const found = search('unicorn', 'random')
-  t.ok(found.items[0].arg === '🦄')
+  t.ok(found.items[0].arg === '🦄', "Expected to find '🦄' but was '" + found.items[0].arg + "'")
 })
