@@ -1,9 +1,7 @@
 'use strict'
 
-const libContainsEmoji = require('./emojiLibrary').libContainsEmoji
+const { emojiSlugs, emojiNames, libContainsEmoji } = require('./emojiLibrary')
 const emojiLibrary = require('./emojiLibrary').lib
-const emojiSlugs = require('./emojiLibrary').emojiSlugs
-const emojiNames = require('./emojiLibrary').emojiNames
 const modifiers = require('unicode-emoji-json/data-emoji-components')
 const indexedModifiers = Object.values(modifiers)
 
